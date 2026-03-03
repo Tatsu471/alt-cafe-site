@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f7;
+  --foreground: #1a1a1a;
+  
+  /* Dynamic AI Theme Tokens */
+  --ai-primary: #5F4F4D; /* Default to a coffee-like calm gray-brown */
+  --ai-font: var(--font-geist-sans); 
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-ai-primary: var(--ai-primary);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: "Playfair Display", serif;
+  --font-ai-dynamic: var(--ai-font);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +28,9 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-ai-dynamic), sans-serif;
+  /* Smooth transition for when AI changes the theme */
+  transition: background-color 1.5s ease, color 1.5s ease;
 }
