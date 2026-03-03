@@ -1,52 +1,86 @@
 "use client";
-import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/utils/gsap-setup";
 
-interface HeroProps {
-    mood: any;
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useRef } from "react";
+import Image from "next/image";
+
+interface DailyMood {
+    moodText?: string;
+    generatedPost?: string;
+    date?: string;
 }
 
-export default function Hero({ mood }: HeroProps) {
+export default function Hero({ mood }: { mood: DailyMood }) {
     const container = useRef<HTMLDivElement>(null);
+    const textRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
-        // Subtly animate the texts up and fade in
-        gsap.from(".hero-element", {
-            y: 30,
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        tl.from(".hero-bg", {
             opacity: 0,
-            duration: 1.5,
-            stagger: 0.3,
-            ease: "power3.out",
-            delay: 0.2
-        });
+            scale: 1.1,
+            duration: 2,
+        })
+            .from(".hero-badge", {
+                opacity: 0,
+                y: 20,
+                duration: 1,
+            }, "-=1")
+            .from(".hero-title", {
+                opacity: 0,
+                y: 30,
+                duration: 1.2,
+                stagger: 0.2,
+            }, "-=0.8")
+            .from(".hero-description", {
+                opacity: 0,
+                y: 20,
+                duration: 1,
+            }, "-=0.6");
     }, { scope: container });
 
     return (
-        <section ref={container} className="relative w-full min-h-[90vh] flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden">
-            {/* Dynamic Ambient Gradient Background */}
-            <div
-                className="absolute inset-0 opacity-[0.15] mix-blend-multiply transition-colors duration-[2000ms]"
-                style={{ background: `radial-gradient(circle at center, var(--ai-primary) 0%, transparent 80%)` }}
-            />
+        <section ref={container} className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden">
+            {/* Background Image with Overlay */}
+            <div className="hero-bg absolute inset-0 z-0">
+                <Image
+                    src="/images/alt_cafe_background.png" // We'll need to move/copy the generated image here
+                    alt="Premium Cafe Interior"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+            </div>
 
-            {/* Glassmorphism Card */}
-            <div className="hero-element relative z-10 max-w-4xl w-full p-8 md:p-16 backdrop-blur-2xl bg-white/5 border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl flex flex-col items-center text-center">
-
-                <div className="hero-element mb-6 inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-[var(--ai-primary)]/30 bg-[var(--ai-primary)]/5">
-                    <span className="w-2 h-2 rounded-full bg-[var(--ai-primary)] animate-pulse" />
-                    <span className="text-sm font-medium tracking-widest uppercase text-[var(--ai-primary)]">
-                        Today's Vibe
-                    </span>
+            {/* Content */}
+            <div className="relative z-10 text-center px-6 max-w-4xl space-y-8">
+                <div className="hero-badge inline-block px-4 py-1 rounded-full border border-white/20 glass text-[10px] tracking-[0.3em] uppercase opacity-70 mb-4">
+                    Today's Atmosphere
                 </div>
 
-                <h1 className="hero-element text-4xl md:text-5xl lg:text-7xl font-bold mb-8 leading-tight tracking-tight">
-                    {mood?.moodText || "旬の感性を、AIと共に。"}
+                <h1 className="hero-title text-4xl md:text-7xl leading-tight font-serif tracking-tighter">
+                    旬の感性を、<br />
+                    <span className="gradient-text">AIと共に。</span>
                 </h1>
 
-                <p className="hero-element text-lg md:text-xl lg:text-2xl leading-relaxed text-foreground/80 max-w-3xl font-serif">
-                    {mood?.generatedPost || "今のあなたにぴったりの一杯を。"}
+                <p className="hero-description text-sm md:text-lg text-white/60 leading-relaxed font-sans max-w-2xl mx-auto">
+                    {mood?.generatedPost || "店主の微かな「今の空気感」や直感的な「インスピレーション」をAIが汲み取り、その瞬間のベストな体験をメニューと空間へ翻訳します。"}
                 </p>
 
+                <div className="pt-8 hero-description">
+                    <button className="px-8 py-4 bg-white text-black font-sans text-xs uppercase tracking-widest hover:bg-[var(--ai-primary)] hover:text-white transition-all duration-300 rounded-full">
+                        Discover Today's Selection
+                    </button>
+                </div>
+            </div>
+
+            {/* Scroll Indicator */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2 opacity-30">
+                <span className="text-[8px] tracking-[0.4em] uppercase">Scroll</span>
+                <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent" />
             </div>
         </section>
     );
